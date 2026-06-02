@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Crypto Deck</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-midnight: #06060a;
+            --neon-pink: #ff2a85;
+            --neon-purple: #9a1fec;
+            --gloss-card: rgba(20, 15, 30, 0.7);
+            --border-glow: rgba(154, 31, 236, 0.25);
+            --text-light: #f1ebf7;
+            --text-muted: #5b5170;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-midnight);
+            background-image: radial-gradient(circle at center, #110c1f 0%, var(--bg-midnight) 80%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-light);
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        /* --- 3D Card Stage --- */
+        .deck-stage {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 360px;
+            height: 240px;
+            margin-bottom: 30px;
+        }
+
+        .flash-card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .flash-card.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        /* --- Shared Card Layout --- */
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            background: var(--gloss-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 24px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255,255,255,0.05);
+        }
+
+        /* Card Front Face */
+        .card-front {
+            z-index: 2;
+        }
+
+        /* Card Back Face */
+        .card-back {
+            transform: rotateY(180deg);
+            border-color: rgba(255, 42, 133, 0.3);
+            box-shadow: 0 0 30px rgba(255, 42, 133, 0.05);
+        }
+
+        /* --- Typography & Elements --- */
+        .card-stamp {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--neon-pink);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .card-front h3 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            margin-top: 15px;
+            background: linear-gradient(90deg, #ffffff, #cfaaff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card-back p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #e2daeb;
+            margin-top: 10px;
+        }
+
+        .card-hint {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: right;
+        }
+
+        /* --- Control Interface Row --- */
+        .control-cluster {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(154, 31, 236, 0.2);
+            color: var(--text-light);
+            padding: 14px;
+            border-radius: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--neon-pink);
+            background: rgba(255, 42, 133, 0.05);
+            box-shadow: 0 0 15px rgba(255, 42, 133, 0.1);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="deck-stage">
+        <div class="flash-card" id="card-node">
+            
+            <div class="card-face card-front">
+                <span class="card-stamp" id="front-index">// VECTOR_01</span>
+                <h3 id="front-title">SHA-256</h3>
+                <span class="card-hint">Click to decrypt data</span>
+            </div>
+
+            <div class="card-face card-back">
+                <span class="card-stamp">// SYSTEM_DECRYPT_TRUE</span>
+                <p id="back-payload">Generates a fixed-size 256-bit (32-byte) unique signature cryptographic hash value. Irreversible signature asset pattern.</p>
+                <span class="card-hint">Click to close node</span>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="control-cluster">
+        <button class="nav-btn" id="prev-trigger">PREV_NODE</button>
+        <button class="nav-btn" id="next-trigger">NEXT_NODE</button>
+    </div>
+
+    <script>
+        // --- High-Tech Cipher Array Data Pool ---
+        const cipherData = [
+            { title: "SHA-256", text: "Generates a fixed-size 256-bit (32-byte) unique signature cryptographic hash value. Completely irreversible signature asset." },
+            { title: "AES-256", text: "Advanced Encryption Standard using symmetric block cyphers. Universally recognized master standard for structural database locking." },
+            { title: "RSA Architecture", text: "Asymmetric mathematical encryption standard relying on a public key to lock vectors and a private key for secure authentication." },
+            { title: "Salt Nodules", text: "Random data sequences generated alongside password characters before processing into hash configurations to mitigate rainbow table cracking." }
+        ];
+
+        let currentIndex = 0;
+
+        const cardNode = document.getElementById('card-node');
+        const frontIndex = document.getElementById('front-index');
+        const frontTitle = document.getElementById('front-title');
+        const backPayload = document.getElementById('back-payload');
+        
+        const prevTrigger = document.getElementById('prev-trigger');
+        const nextTrigger = document.getElementById('next-trigger');
+
+        // --- Core UI Node State Reducer ---
+        function syncCardContents() {
+            cardNode.classList.remove('is-flipped');
+            
+            // Allow rotation to reset completely before altering strings inside text nodes
+            setTimeout(() => {
+                const node = cipherData[currentIndex];
+                frontIndex.innerText = `// VECTOR_0${currentIndex + 1}`;
+                frontTitle.innerText = node.title;
+                backPayload.innerText = node.text;
+            }, 150);
+        }
+
+        // --- Event Listeners Matrix ---
+        cardNode.addEventListener('click', () => {
+            cardNode.classList.toggle('is-flipped');
+        });
+
+        prevTrigger.addEventListener('click', (e) => {
+            e.stopPropagation(); // Avoid triggering card rotation loops
+            currentIndex = (currentIndex === 0) ? cipherData.length - 1 : currentIndex - 1;
+            syncCardContents();
+        });
+
+        nextTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            currentIndex = (currentIndex === cipherData.length - 1) ? 0 : currentIndex + 1;
+            syncCardContents();
+        });
+    </script>
+</body>
+</html>
